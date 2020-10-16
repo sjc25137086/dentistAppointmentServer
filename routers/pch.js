@@ -1,6 +1,6 @@
 const express=require('express');
 const pool=require('../pool.js');
-const redis = require('../redis.js')
+// const redis = require('../redis.js')
 const zhenzismsClient = require('../public/zhenzisms.js');
 const { response } = require('express');
 var router=express.Router();
