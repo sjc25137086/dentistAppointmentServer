@@ -46,15 +46,6 @@ router.post('/register',async (req,res)=>{
   })
 })
 
-router.get('/regsend',(req,res)=>{
-    var params = {};
-	params.templateId = '1836';
-	params.number = '13298531156';
-	params.templateParams = ["1862", "5分钟"];
-    var result = client.send(params);
-    res.send(result.data)
-    console.log(111);
-})
 router.get('/login',(req,res)=>{
   let phone=req.query.phone;
   let password=req.query.password;
@@ -82,7 +73,6 @@ router.post('/forward',(req,res)=>{
 	let time = req.body.time;
 	let time2 = new Date().getTime();
 	let sql = `insert into yy_forward(doctorid,fname,fage,fsex,idCard,phone,state,userid,time) values (?,?,?,?,?,?,?,?,?)`;
-	console.log(time2);
 	pool.query(sql,[doctorid,fname,fage,fsex,idCard,phone,state,userid,time],(err,result)=>{
 		if(err) throw err;
 		let sql = 'insert into yy_time(doctorid,time) values (?,?)'
