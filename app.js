@@ -5,7 +5,7 @@ const cors=require('cors')
 const session =require("express-session");
 const pool=require('./pool.js');
 const userRouter=require('./routers/user.js');
-
+const searchRouter=require('./routers/pch.js');
 // 构建服务器，指定端口号
 var app=express();
 app.listen(3000);
@@ -30,5 +30,6 @@ app.use(session({
 // // 挂载路由
 // app.use('/movie',movieRouter);
 app.use('/user',userRouter);
+app.use('/search',searchRouter);
 // app.use('/order',orderRouter);
 // app.use('/product',productRouter);

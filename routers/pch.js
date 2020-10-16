@@ -11,95 +11,94 @@ router.get('/province',(req,res)=>{
     pool.query(sql,(err,result)=>{
         if(err) return err;
         if(result==''){
-            res.send({code:702})
+            res.send({code:500})
         }else{
-            res.send({code:701,result: result})
+            res.send({code:200,result: result})
         }
     })
 })
 
-router.get('/province/city',(req,res)=>{
+router.get('/city',(req,res)=>{
     let provinceid = req.query.provinceid
-    let sql = 'select city from city where provinceid=?'
+    let sql = 'select cityid,city from city where fatherid=?'
     pool.query(sql,[provinceid],(err,result)=>{
-        if(err) return err;
+        if(err) throw err;
         if(result == ''){
-            res.send({code:702})
+            res.send({code:500})
         }else{
-            res.send({code:701,result: result})
+            res.send({code:200,result: result})
         }
     })
 })
 
-router.get('/city/hospital',(req,res)=>{
+router.get('/hospital',(req,res)=>{
     let cityid = req.query.cityid;
-    let sql = 'select hname,img,level,hsite form (select city from city where cityid=?) c left join hospital h on c.city = h.city ';
-    pool.query(sql,[city.id],(err,reuslt)=>{
-        if(err) return err;
+    let sql = 'select hname,img,level,hsite from yy_hospital where cityid = '+cityid;
+    pool.query(sql,(err,result)=>{
+        if(err) throw err;
         if(result == ''){
-            res.send({code: 702})
+            res.send({code: 500})
         }else{
-            res.send({code:701,result: result})
+            res.send({code:200,result: result})
         }
     }) 
 })
 
 
-router.get('/province/city/hospital/ks',(req,res)=>{
+router.get('/ks',(req,res)=>{
     let hospitalid = req.query.hospitalid;
     let sql = 'select kname from yy_ks where hospitalid = ?';
-    pool.query(sql,[hospitalid],(req,res)=>{
+    pool.query(sql,[hospitalid],(err,result)=>{
         if(err) return err;
         if(result == ''){
-            res.send({code: 702})
+            res.send({code: 500})
         }else{
-            res.send({code:701,result: result})
+            res.send({code:200,result: result})
         }
     })
 })
 
-router.get('/province/city/hospital/ks/doctors',(req,res)=>{
+router.get('/doctors',(req,res)=>{
     let ksid = req.query.ksid;
     let sql = 'select id,dname,price,img,dposition,dage from yy_doctor where ksid= ?';
     pool.query(sql,[ksid],(err,result)=>{
-        if(err) return err;
-        if(result == ''){
-            res.send({code: 702})
-        }else{
-            let doctorid = result.doctorid;
-            sql = 'select count(id) num from yy_time where doctorid=?'
-            pool.query(sql,[doctorid],(err,num)=>{
-                if(num.num <16){
-                    res.send({code:701,result: result,hastime: true})
-                }else{
-                    res.send({code:701,result:result,hastime: false})
-                }
-            })
-            
-        }
+        if(err) throw err;
+        res.send({code:200,result:result})
     })
 })
 
-router.get('/province/city/hospital/ks/doctors/doctor',(req,res)=>{
+router.get('/doctor',(req,res)=>{
+    let doctorid = req.query.doctorid;
+    let sql = 'select id,dname,img,dposition,dage,price,description,intro from yy_doctor where id= ?';
+    pool.query(sql,[doctorid],(err,result)=>{
+        if(err) throw err;
+        if(result == ''){
+            res.send({code: 500})
+        }else{
+            res.send({code: 200,result: result})
+        }
+    })
+})
+router.get('/time',(req,res)=>{
     let doctorid = req.query.doctorid;
     let daystarttime = req.query.daystarttime;
     let dayendtime = req.query.dayendtime;
-    let sql = 'select id,dname,img,dposition,dage,price,description,intro from yy_doctor where ksid= ?';
-    
+
+    let sql = 'select time from yy_time where doctorid = ? and time>? and time<?'
+    pool.query(sql,[doctorid,daystarttime,dayendtime],(err,notime)=>{
+        if(err){ throw err}
+        res.send({code: 200,result: notime})
+    })
+})
+
+router.get('/day',(req,res)=>{
+    let doctorid = req.query.doctorid;
+    let sql = 'select restday from yy_schedule where doctorid = ?'
     pool.query(sql,[doctorid],(err,result)=>{
-        if(err) return err;
-        if(result == ''){
-            res.send({code: 702})
-        }else{
-            let sql = 'select time from yy_time where doctorid = ? and time>? and time<?'
-            pool.query(sql,[doctorid,daystarttime,dayendtime],(err,notime)=>{
-                if(err){ return err}
-                res.send({code: 701,result: result,notime: notime})
-            })
-            res.send({code:701,result: result})
-        }
+        if(err){ throw err}
+        res.send({code: 200,result: result})
     })
 })
 
 
-module.exports=router;
+module.exports=router
