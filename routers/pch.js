@@ -33,7 +33,7 @@ router.get('/city',(req,res)=>{
 
 router.get('/hospital',(req,res)=>{
     let cityid = req.query.cityid;
-    let sql = 'select hname,img,level,hsite from yy_hospital where cityid = '+cityid;
+    let sql = 'select id,hname,img,level,hsite from yy_hospital where cityid = '+cityid;
     pool.query(sql,(err,result)=>{
         if(err) throw err;
         if(result == ''){
@@ -47,7 +47,7 @@ router.get('/hospital',(req,res)=>{
 
 router.get('/ks',(req,res)=>{
     let hospitalid = req.query.hospitalid;
-    let sql = 'select kname from yy_ks where hospitalid = ?';
+    let sql = 'select id,kname from yy_ks where hospitalid = ?';
     pool.query(sql,[hospitalid],(err,result)=>{
         if(err) return err;
         if(result == ''){
@@ -84,21 +84,21 @@ router.get('/time',(req,res)=>{
     let daystarttime = req.query.daystarttime;
     let dayendtime = req.query.dayendtime;
 
-    let sql = 'select time from yy_time where doctorid = ? and time>? and time<?'
-    pool.query(sql,[doctorid,daystarttime,dayendtime],(err,notime)=>{
-        if(err){ throw err}
-        res.send({code: 200,result: notime})
-    })
-})
-
-router.get('/day',(req,res)=>{
-    let doctorid = req.query.doctorid;
-    let sql = 'select restday from yy_schedule where doctorid = ?'
-    pool.query(sql,[doctorid],(err,result)=>{
+    let sql = 'select doctorid,time from yy_time where doctorid = ? and time>? and time<?'
+    pool.query(sql,[doctorid,daystarttime,dayendtime],(err,result)=>{
         if(err){ throw err}
         res.send({code: 200,result: result})
     })
 })
+
+// router.get('/day',(req,res)=>{
+//     let doctorid = req.query.doctorid;
+//     let sql = 'select restday from yy_schedule where doctorid = ?'
+//     pool.query(sql,[doctorid],(err,result)=>{
+//         if(err){ throw err}
+//         res.send({code: 200,result: result})
+//     })
+// })
 
 
 module.exports=router

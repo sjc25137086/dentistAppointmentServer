@@ -19,14 +19,14 @@ router.post('/regsend',(req,res)=>{
     client.send(params);
     res.send({code:200})
 })
-router.post('/register',async (req,res)=>{
+router.post('/register',(req,res)=>{
   var phone=req.body.phone;
   var password = req.body.password;
 //   var sms = req.body.sms;
 //   redis.get(phone,(err,data)=>{
 	//   if(data == sms){
 		let sql="SELECT * FROM yy_user WHERE phone=?";
-		pool.query(sql,[phone,password],(err,result)=>{
+		pool.query(sql,[phone],(err,result)=>{
 			if(err) throw err;
 			if(result != ''){
 				res.send({code:601}) //601 手机号已存在
@@ -35,9 +35,17 @@ router.post('/register',async (req,res)=>{
 				pool.query(sql,[phone,password],(err,result)=>{
 					if(err) throw err;
 					if(result.affectedRows>0){
-						res.send({code:200});
+						let sql="SELECT username,phone,id FROM yy_user WHERE phone=? AND password=?";
+						pool.query(sql,[phone,password],(err,result)=>{
+							if(err) throw err;
+							if(result.length>0){
+								res.send({code:200,result:result});
+							}else{
+								res.send({code:500});
+							}
+						  })
 					}else{
-						res.send({code:603});
+						res.send({code:500});
 					}
 				})
 			}
@@ -91,7 +99,7 @@ router.post('/forward',(req,res)=>{
 })
 router.get('/doingforward',(req,res)=>{
 	var uid=req.query.uid;
-	let sql = "select fname,time,state,doctorid from yy_forward where userid=? and state!=1";
+	let sql = "select id,createtime,fname,time,state,doctorid from yy_forward where userid=? and state=2";
 	pool.query(sql,[uid],(err,result)=>{
 		if(err) throw err;
 		res.send({code:200,result});
@@ -100,7 +108,7 @@ router.get('/doingforward',(req,res)=>{
 
 router.get('/overforward',(req,res)=>{
 	var uid=req.query.uid;
-	let sql = "select fname,time,state,doctorid from yy_forward where userid=? and state=1";
+	let sql = "select id,createtime,fname,time,state,doctorid from yy_forward where userid=? and state!=2";
 	pool.query(sql,[uid],(err,result)=>{
 		if(err) throw err;
 		res.send({code:200,result});
@@ -122,7 +130,14 @@ router.delete('/cancelforward',(req,res)=>{
 	})
 })
 
-
+router.get('/forwardmsg',(req,res)=>{
+	var forwardid = req.query.forwardid;
+	var sql = 'select id,fname,fage,fsex,idCard,phone,doctorid,time,createtime from yy_forward where forwardid = ?'
+	pool.query(sql,[forwardid],(err,result)=>{
+		if(err) throw err;
+		res.send({code:200,result: result})
+	})
+})
 router.patch('/username',(req,res)=>{
 	let username=req.body.username;
 	let id = req.body.id;
@@ -133,14 +148,14 @@ router.patch('/username',(req,res)=>{
 	})
 })
 
-router.patch('/password',(req,res)=>{
-	let password=req.body.password;
+router.patch('/phone',(req,res)=>{
+	let phone=req.body.phone;
 	let id = req.body.id;
 	let sql="SELECT * FROM yy_user WHERE phone=?";
-	pool.query(sql,[phone,password],(err,result)=>{
+	pool.query(sql,[phone,id],(err,result)=>{
 		if(result == ''){
-			let sql = 'update yy_user set password = ? where id =?'
-			pool.query(sql,[password,id],(err,result)=>{
+			let sql = 'update yy_user set phone = ? where id =?'
+			pool.query(sql,[phone,id],(err,result)=>{
 				if(err)throw err;
 				res.send({code:200})
 			})
@@ -150,11 +165,11 @@ router.patch('/password',(req,res)=>{
 	})
 })
 
-router.patch('/phone',(req,res)=>{
-	let phone=req.body.phone;
+router.patch('/password',(req,res)=>{
+	let password=req.body.password;
 	let id = req.body.id;
-	let sql = 'update yy_user set phone = ? where id =?'
-	pool.query(sql,[phone,id],(err,result)=>{
+	let sql = 'update yy_user set password = ? where id =?'
+	pool.query(sql,[password,id],(err,result)=>{
 		if(err)throw err;
 		res.send({code:200})
 	})
