@@ -91,14 +91,14 @@ router.get('/time',(req,res)=>{
     })
 })
 
-// router.get('/day',(req,res)=>{
-//     let doctorid = req.query.doctorid;
-//     let sql = 'select restday from yy_schedule where doctorid = ?'
-//     pool.query(sql,[doctorid],(err,result)=>{
-//         if(err){ throw err}
-//         res.send({code: 200,result: result})
-//     })
-// })
+router.get('/day',(req,res)=>{
+    let doctorid = req.query.doctorid;
+    let sql = 'select restday from yy_schedule where doctorid = ?'
+    pool.query(sql,[doctorid],(err,result)=>{
+        if(err){ throw err}
+        res.send({code: 200,result: result})
+    })
+})
 
 
 module.exports=router
